@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, Alert, KeyboardAvoidingView, TouchableWithoutFeedback, StyleSheet, Platform, Keyboard, Modal, ScrollView } from 'react-native';
 import firebase from 'firebase';
+import Constants from 'expo-constants';
 import Header from '../components/Header';
 import db from '../config';
 
@@ -35,33 +36,33 @@ export default class LoginScreen extends React.Component {
                                     maxLength={15}/>
                                 <TextInput
                                     style={styles.modalInput}
-                                    placeholder={"last Name"}
+                                    placeholder={"Last Name"}
                                     onChangeText={(text)=>{this.setState({last_name:text})}}
                                     maxLength={15}/>
                                 <TextInput
                                     style={styles.modalInput}
-                                    placeholder={"address"}
+                                    placeholder={"Address"}
                                     onChangeText={(text)=>{this.setState({address:text})}}
                                     multiline={true}/>
                                 <TextInput
                                     style={styles.modalInput}
-                                    placeholder={"mobile no"}
+                                    placeholder={"Mobile no"}
                                     onChangeText={(text)=>{this.setState({contact:text})}}
                                     maxLength={10}
                                     keyboardType={'number-pad'}/>
                                 <TextInput
                                     style={styles.modalInput}
-                                    placeholder={"email"}
+                                    placeholder={"Email"}
                                     onChangeText={(text)=>{this.setState({email:text})}}
                                     keyboardType={'email-address'}/>
                                 <TextInput
                                     style={styles.modalInput}
-                                    placeholder={"password"}
+                                    placeholder={"Password"}
                                     onChangeText={(text)=>{this.setState({password:text})}}
                                     secureTextEntry={true}/>
                                 <TextInput
                                     style={styles.modalInput}
-                                    placeholder={"confirm password"}
+                                    placeholder={"Confirm password"}
                                     onChangeText={(text)=>{this.setState({confirmPassword:text})}}
                                     secureTextEntry={true}/>
                                 <View>
@@ -73,7 +74,7 @@ export default class LoginScreen extends React.Component {
                                             <Text style={styles.loginText}>Register</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
-                                        style={[styles.login,{marginTop:10}]}
+                                        style={[styles.login,{marginTop:10,marginBottom:10}]}
                                         onPress={()=>{
                                             this.setState({isModalVisible:false})
                                         }}>
@@ -90,7 +91,9 @@ export default class LoginScreen extends React.Component {
         if (email && password) {
             try {
                 const response = await firebase.auth().signInWithEmailAndPassword(email,password)
-                return Alert.alert('Loged in Succesfully')
+                    .then(()=>{
+                        this.props.navigation.navigate('RequestBook')
+                    })
             } catch (error) {
                 switch (error.code) {
                     case 'auth/user-not-found':
@@ -134,7 +137,7 @@ export default class LoginScreen extends React.Component {
     }
     render(){
         return(
-            <KeyboardAvoidingView behavior={Platform.OS === "android" ? "padding" : "height"} style={styles.container}>
+            <KeyboardAvoidingView behavior={Platform.OS === "android" ? "padding" : "height"} style={[styles.container,{paddingTop:Constants.statusBarHeight}]}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View>
                         <Header/>
@@ -163,17 +166,14 @@ export default class LoginScreen extends React.Component {
                         <TouchableOpacity
                             style={[styles.login,{marginTop:10}]}
                             onPress={()=>{
-                                this.login(this.state.email,this.state.password)
+                                // this.login(this.state.email,this.state.password)
+                                this.props.navigation.navigate('RequestBook')
                             }}>
                                 <Text style={styles.loginText}>Login</Text>
                         </TouchableOpacity>
                     </View>
-                    <View>
-                        <TouchableOpacity
-                            style={[styles.login,{marginTop:5}]}
-                            onPress={this.showModal}>
-                                <Text style={styles.loginText}>Sign Up</Text>
-                        </TouchableOpacity>
+                    <View style={{alignSelf:'center',margin:20,borderWidth:5,borderColor:'orange'}}>
+                        {this.showModal()}
                     </View>
                     </View>
                 </TouchableWithoutFeedback>
@@ -207,11 +207,16 @@ const styles = StyleSheet.create({
         width:250,
         height:35,
         borderWidth:2,
-        borderRadius:10
+        borderRadius:10,
+        marginHorizontal:15,
+        marginBottom:5,
+        paddingLeft:10
     },
     modalTitle: {
         fontSize:35,
-        fontWeight:'bold'
+        fontWeight:'bold',
+        alignSelf:'center',
+        margin:10
     },
     modalScroll: {
         width:'100%'
