@@ -3,10 +3,11 @@ import { View, Text, Image } from 'react-native';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
 import Donate from '../screens/DonateScreen';
 import Request from '../screens/RequestScreen';
+import { AppStackNavigator } from './AppStackNavigator';
 
 export const AppTabNavigator = createBottomTabNavigator({
         RequestBook: {screen: Request},
-        DonateBook: {screen: Donate}
+        DonateBook: {screen: AppStackNavigator}
     },
     {
         defaultNavigationOptions: ({ navigation }) =>({

@@ -5,10 +5,12 @@ import ReciverDetails from '../screens/ReciverDetail';
 export const AppStackNavigator = createStackNavigator(
     {
         BookDonateList: {
-            screen: Donate
+            screen: Donate,
+            navigationOptions: {headerShown:false}
         },
         ReciverList: {
-            screen: ReciverDetails
+            screen: ReciverDetails,
+            navigationOptions: {headerShown:true}
         }
     },
     {
