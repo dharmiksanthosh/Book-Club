@@ -6,6 +6,7 @@ import { Header } from 'react-native-elements';
 import Constants from 'expo-constants';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Alert } from 'react-native';
+import MyHeader from '../components/MyHeader';
 
 export default class UserDetail extends React.Component{
     constructor(){
@@ -58,13 +59,13 @@ export default class UserDetail extends React.Component{
         return(
             <SafeAreaProvider>
             <KeyboardAvoidingView behavior={Platform.OS === "android" ? "padding" : "height"} style={[styles.container,{paddingTop:Constants.statusBarHeight}]}>
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                
                     <View>
                     <View>
-                        <Header
-                            centerComponent={{ text: 'Update Profile', style: { color: '#000', fontWeight: 'bold', fontSize: '30' }}}
-                            containerStyle={{
-                                backgroundColor: '#f4c92d'}}/>
+                        <MyHeader
+                            title='Update Profile'
+                            bellPressAction={()=>{this.props.navigation.navigate('Notification')}}
+                            barPressAction={()=>{this.props.navigation.toggleDrawer()}}/>
                     </View>
                     <View style={{flex:1,alignItems:'center'}}>
                         <TextInput
@@ -104,7 +105,7 @@ export default class UserDetail extends React.Component{
                         </TouchableOpacity>
                     </View>
                     </View>
-                </TouchableWithoutFeedback>
+                
             </KeyboardAvoidingView>
             </SafeAreaProvider>
         );
@@ -115,13 +116,7 @@ const styles = StyleSheet.create({
     container: {
       flex: 1
     },
-    input: {
-        width:250,
-        height:35,
-        borderWidth:2,
-        borderRadius:10,
-        paddingLeft:35
-    },
+   
     button: {
         height:30,
         width:90,
@@ -141,13 +136,5 @@ const styles = StyleSheet.create({
         marginBottom:5,
         paddingLeft:10
     },
-    modalTitle: {
-        fontSize:35,
-        fontWeight:'bold',
-        alignSelf:'center',
-        margin:10
-    },
-    modalScroll: {
-        width:'100%'
-    }
+ 
   });

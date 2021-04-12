@@ -5,46 +5,80 @@ import db from '../config'
 import { Header, ListItem } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Constants from 'expo-constants'
+import MyHeader from '../components/MyHeader';
 
 export default class MyDonation extends React.Component{
     constructor(){
         super();
         this.state={
-            donorId: firebase.auth().currentUser.email,
+            donorId: firebase.auth().currentUser,
             allDonations: [],
-            donorName: ''
-        }
+            donorName: '',
+           }
     }
-    getAllDonation = ()=>{
-        db.collection('allDonations')
-            .where('donorId','==',this.state.donorId)
-            .onSnapshot((snapshot)=>{
-                var allDonations = snapshot.docs.map(document=>document.data())
-                this.setState({
-                    allDonations: allDonations
-                })
-            })
-    }
-    getDonorDetails=()=>{
-        db.collection('Users')
-            .where('username','==',this.state.donorId)
+    getAllDonation = async()=>{
+      var donor = this.state.donorId.email
+        this.requestRef = await db.collection('allDonations').where('donorId','==',donor).onSnapshot((snapshot)=>{
+       var donations = []
+       console.log(donations);
+       snapshot.docs.map((doc) =>{
+         var donation = doc.data()
+         donation["doc_id"] = doc.id
+         donations.push(donation)
+         
+         this.setState({
+            allDonations : donations,
+        });
+       });
+       
+     })
+     console.log(this.state.allDonations)
+   }
+    getDonorDetails=async()=>{
+      var user = this.state.donorId.email
+       await db.collection('Users')
+            .where('username','==',user)
             .get()
             .then((snapshot)=>{
                 snapshot.forEach((doc)=>{
                     this.setState({
-                        donorName: doc.data().firstName+' '+doc.data().lastName
+                        donorName: doc.data().first_name+' '+doc.data().last_name
                     })
                 })
             })
+            console.log(this.state.donorName)
     }
     componentDidMount(){
         this.getAllDonation()
         this.getDonorDetails()
     }
+    
+    sendBook=(bookDetails)=>{
+      var requestStatus
+     if(bookDetails.requestStatus === "Book Sent"){
+       requestStatus = "Donor is Interested"
+       db.collection("allDonations").doc(bookDetails.doc_id).update({
+         'requestStatus' : "Donor is Interested"
+       })
+       console.log(requestStatus)
+       this.sendNotification(bookDetails,requestStatus)
+     }
+     else{
+       requestStatus = "Book Sent"
+       db.collection("allDonations").doc(bookDetails.doc_id).update({
+        'requestStatus' : "Book Sent"
+       })
+       console.log(requestStatus)
+       this.sendNotification(bookDetails,requestStatus)
+     }
+   }
+
     sendNotification = (bookDetails,requestStatus)=>{
+      console.log("Reached Send Notification")
         var reciverId = bookDetails.targetId;
-        var requestStatus = requestStatus;
+        console.log(reciverId)
         var donorId = bookDetails.donorId;
+        console.log(donorId)
         db.collection('allNotification')
             .where('targetId','==',reciverId)
             .where('donorId','==',donorId)
@@ -52,13 +86,13 @@ export default class MyDonation extends React.Component{
             .then((snapshot)=>{
                 snapshot.forEach((doc)=>{
                     var message = '';
-                    if (requestStatus === 'bookSend') {
+                    if (requestStatus === 'Book Sent') {
                         message = this.state.donorName+' sent you the book'
                     } else {
                         message = this.state.donorName+' has shown interest in donating the book'
                     }
                     db.collection('allNotification')
-                        .doc(docId)
+                        .doc(doc.id)
                         .update({
                             'message': message,
                             'notificationStatus': 'unread',
@@ -67,34 +101,19 @@ export default class MyDonation extends React.Component{
                 })
             })
     }
-    sendBook = (bookDetails)=>{
-        if (bookDetails.requestStatus === 'book send') {
-            var requestedStatus = 'donor interested'
-            db.collection('allDonations')
-                .doc(bookDetails.docId)
-                .update({
-                    'requestStatus': requestedStatus,
-                })
-            this.sendNotification(bookDetails,requestedStatus)
-        } else {
-            var requestedStatus = 'book send'
-            db.collection('allDonations')
-                .doc(bookDetails.docId)
-                .update({
-                    'requestStatus': requestedStatus,
-                })
-            this.sendNotification(bookDetails,requestedStatus)
-        }
-    }
+
+
+
     render(){
         return(
             <SafeAreaProvider>
             <View style={{paddingTop:Constants.statusBarHeight}}>
-                <Header
-                    centerComponent={{ text: 'My Donations', style: { color: '#000', fontWeight: 'bold', fontSize: '30' }}}
-                    containerStyle={{
-                        backgroundColor: '#f4c92d'}}/>
+                <MyHeader
+                    title='My Donations'
+                    bellPressAction={()=>{this.props.navigation.navigate('Notification')}}
+                    barPressAction={()=>{this.props.navigation.toggleDrawer()}}/>
                 <View>
+                {console.log(this.state.allDonations)}
                     <FlatList
                         keyExtractor={(item,index)=>index.toString()}
                         data={this.state.allDonations}

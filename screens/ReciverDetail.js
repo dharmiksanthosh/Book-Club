@@ -1,16 +1,19 @@
+//changed line 15 (userid)
+//changed line 87 fontSize
 import * as React from 'react';
 import { Text, TouchableOpacity, View, StyleSheet } from 'react-native';
 import firebase from 'firebase';
 import db from '../config'
 import { Card, Header } from 'react-native-elements';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import MyHeader from '../components/MyHeader';
 
 export default class ReciverDetails extends React.Component {
     constructor(props){
         super(props);
         this.state={
-            userId: firebase.auth().currentUser.email,
-            reciverId: 'jay1@gmail.com',
+            donorId: firebase.auth().currentUser.email,
+            reciverId:this.props.navigation.getParam('details')['userId'],
             requestId:this.props.navigation.getParam('details')['requestId'],
             bookName:this.props.navigation.getParam('details')['bookName'],
             description:this.props.navigation.getParam('details')['description'],
@@ -21,13 +24,14 @@ export default class ReciverDetails extends React.Component {
         }
     }
     getReciverDetails = async()=>{
-        console.log(this.state.userId)
+        console.log(this.state.donorId)
         db.collection('Users')
             .where('username','==',this.state.reciverId)
             .get()
             .then(snapshot=>{
                 snapshot.forEach(doc=>{
                     var data = doc.data();
+                    console.log(data)
                     this.setState({
                         reciverName:data.first_name,
                         reciverContact:data.contact,
@@ -52,16 +56,17 @@ export default class ReciverDetails extends React.Component {
                 bookName:this.state.bookName,
                 requestId:this.state.requestId,
                 requestedBy:this.state.reciverName,
-                donorId:this.state.userId,
+                donorId:this.state.donorId,
+                targetId:this.state.reciverId,
                 requestStatus:"Donor is Interested"
             })
     }
     addNotification = () =>{
-        var message = this.state.userId+' has shown interest in Donating the Book';
+        var message = this.state.donorId+' has shown interest in Donating the Book';
         db.collection('allNotification')
         .add({
             'targetId': this.state.reciverId,
-            'donorId': this.state.userId,
+            'donorId': this.state.donorId,
             'requestId': this.state.requestId,
             'bookName': this.state.bookName,
             'date':firebase.firestore.FieldValue.serverTimestamp(),
@@ -75,14 +80,32 @@ export default class ReciverDetails extends React.Component {
     render(){
         return(
             <SafeAreaProvider>
-            <View>
-                <Header
-                    centerComponent={{ text: 'Reciver Details', style: { color: '#000', fontWeight: 'bold', fontSize: '30' }}}
-                    containerStyle={{
-                        backgroundColor: '#f4c92d'}}/>
+            <View style={{flex:1}}>
+             <View style={{flex:0.1}}>
+                <MyHeader
+                        title='Reciver Details'
+                        bellPressAction={()=>{this.props.navigation.navigate('Notification')}}
+                        barPressAction={()=>{this.props.navigation.toggleDrawer()}}/>
+              </View>
+              <View style={{ flex: 0.3 }}>
+            <Card title={'Book Information'} titleStyle={{ fontSize: 20 }}>
+              <Card>
+                <Text style={{ fontWeight: 'bold' }}>
+                  Name : {this.state.bookName}
+                </Text>
+              </Card>
+
+              <Card>
+                <Text style={{ fontWeight: 'bold' }}>
+                  Description : {this.state.description}
+                </Text>
+              </Card>
+            </Card>
+          </View>
+              <View style={{flex:0.3}}>
                 <Card
                     title={"Reciver Information"}
-                    titleStyle={{fontWeight:20,fontWeight:'bold'}}>
+                    titleStyle={{fontSize:20,fontWeight:'bold'}}>
                     <Card>
                         <Text style={{fontWeight:'bold'}}>Name: {this.state.reciverName}</Text>
                     </Card>
@@ -93,8 +116,9 @@ export default class ReciverDetails extends React.Component {
                         <Text style={{fontWeight:'bold'}}>Address: {this.state.reciverAddress}</Text>
                     </Card>
                 </Card>
-                <View style={{alignItems:'center',justifyContent:'center'}}>
-                    {this.state.reciverId !== this.state.userId?
+                </View>
+                <View style={{alignItems:'center',justifyContent:'center',flex:0.3}}>
+                    {this.state.reciverId !== this.state.donorId?
                         (<TouchableOpacity
                             style={styles.button}
                             onPress={()=>{

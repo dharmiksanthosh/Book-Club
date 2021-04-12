@@ -1,3 +1,7 @@
+//Added SignUp button
+//CHanged OnPress of SignUp button
+//Changed onPress of Login Button
+
 import * as React from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, Alert, KeyboardAvoidingView, TouchableWithoutFeedback, StyleSheet, Platform, Keyboard, Modal, ScrollView } from 'react-native';
 import firebase from 'firebase';
@@ -129,7 +133,8 @@ export default class LoginScreen extends React.Component {
                 last_name: this.state.last_name,
                 address: this.state.address,
                 contact: this.state.contact,
-                username: this.state.email
+                username: this.state.email,
+                isBookRequestActive: false,
             })
         } else {
             return Alert.alert('Password does not match')
@@ -138,7 +143,7 @@ export default class LoginScreen extends React.Component {
     render(){
         return(
             <KeyboardAvoidingView behavior={Platform.OS === "android" ? "padding" : "height"} style={[styles.container,{paddingTop:Constants.statusBarHeight}]}>
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                
                     <View>
                         <Header/>
                     <View>
@@ -166,17 +171,27 @@ export default class LoginScreen extends React.Component {
                         <TouchableOpacity
                             style={[styles.login,{marginTop:10}]}
                             onPress={()=>{
-                                // this.login(this.state.email,this.state.password)
-                                this.props.navigation.navigate('RequestBook')
+                                this.login(this.state.email,this.state.password)
                             }}>
                                 <Text style={styles.loginText}>Login</Text>
+                        </TouchableOpacity>
+                    </View>
+                     <View>
+                        <TouchableOpacity
+                            style={[styles.login,{marginTop:10}]}
+                            onPress={()=>{
+                                this.setState({
+                                  isModalVisible:true
+                                })
+                            }}>
+                                <Text style={styles.loginText}>Sign Up</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={{alignSelf:'center',margin:20,borderWidth:5,borderColor:'orange'}}>
                         {this.showModal()}
                     </View>
                     </View>
-                </TouchableWithoutFeedback>
+                
             </KeyboardAvoidingView>
         );
     }

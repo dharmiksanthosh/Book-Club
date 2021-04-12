@@ -5,6 +5,11 @@ import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { AppDrawerNavigator } from './components/AppDrawerNavigator';
 import { AppTabNavigator } from './components/AppTabNavigator';
 
+//requesterID: jay@shree.com
+//password: 123456
+//donotid: donor@book.com
+//password: 123456
+
 export default class App extends React.Component {
   render(){
     return (
@@ -19,11 +24,3 @@ const switchNavigator = createSwitchNavigator({
 })
 const AppContainer = createAppContainer(switchNavigator);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

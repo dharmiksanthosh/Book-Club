@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import Constants from 'expo-constants';
-import { Header, ListItem } from 'react-native-elements';
+import { ListItem } from 'react-native-elements';
 import * as firebase from 'firebase';
 import db from '../config';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import ReciverDetails from './ReciverDetail';
+import MyHeader from '../components/MyHeader'
 
 export default class Donate extends React.Component {
     constructor(){
@@ -32,10 +33,11 @@ export default class Donate extends React.Component {
         return(
             <SafeAreaProvider>
             <View style={{paddingTop:Constants.statusBarHeight}}>
-                <Header
-                    centerComponent={{ text: 'Donate Book', style: { color: '#000', fontWeight: 'bold', fontSize: '30' }}}
-                    containerStyle={{
-                        backgroundColor: '#f4c92d'}}/>
+                <MyHeader
+                    title='Donate Books'
+                    bellPressAction={()=>{this.props.navigation.navigate('Notification')}}
+                    barPressAction={()=>{this.props.navigation.toggleDrawer()}}
+                />
                 <View>
                     <FlatList
                         keyExtractor={(item,index)=>index.toString()}
